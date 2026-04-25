@@ -1,16 +1,18 @@
 <?php
-    session_start();
-    if (!isset($_SESSION['login'])) {
+session_start();
+if (!isset($_SESSION['login'])) {
     header("Location: ../login.php");
     exit;
 }
+
 include '../koneksi.php';
 
-if (!isset($_SESSION['login'])) {
-    header("Location: ../login.php");
-}
-
-$data = mysqli_query($conn, "SELECT * FROM products");
+// ✅ QUERY SUDAH JOIN KATEGORI
+$data = mysqli_query($conn, "
+    SELECT products.*, kategori.nama_kategori 
+    FROM products 
+    LEFT JOIN kategori ON products.kategori_id = kategori.id
+");
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +38,8 @@ $data = mysqli_query($conn, "SELECT * FROM products");
                 <th>Nama</th>
                 <th>Harga</th>
                 <th>Stok</th>
+                <!-- ✅ KOLOM BARU -->
+                <th>Kategori</th>
                 <th width="150">Aksi</th>
             </tr>
         </thead>
@@ -46,6 +50,10 @@ $data = mysqli_query($conn, "SELECT * FROM products");
                 <td><?= $d['nama_produk'] ?></td>
                 <td>Rp <?= number_format($d['harga']) ?></td>
                 <td><?= $d['stok'] ?></td>
+
+                <!-- ✅ TAMPILKAN KATEGORI -->
+                <td><?= $d['nama_kategori'] ?? '-' ?></td>
+
                 <td>
                     <a href="edit.php?id=<?= $d['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
                     <a href="hapus.php?id=<?= $d['id'] ?>" class="btn btn-danger btn-sm"

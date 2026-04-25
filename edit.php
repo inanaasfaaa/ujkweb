@@ -4,21 +4,31 @@ if (!isset($_SESSION['login'])) {
     header("Location: ../login.php");
     exit;
 }
+
 include '../koneksi.php';
 
+// Ambil ID dari URL
 $id = $_GET['id'];
+
+// Ambil data produk
 $data = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM products WHERE id=$id"));
+
+// Ambil semua kategori
+$kategori = mysqli_query($conn, "SELECT * FROM kategori");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $nama  = $_POST['nama'];
     $harga = $_POST['harga'];
     $stok  = $_POST['stok'];
+    $kategori_id = $_POST['kategori_id']; // ← tambahan
 
+    // UPDATE sudah termasuk kategori_id
     mysqli_query($conn, "UPDATE products SET 
         nama_produk='$nama',
         harga='$harga',
-        stok='$stok'
+        stok='$stok',
+        kategori_id='$kategori_id'
         WHERE id=$id");
 
     header("Location: index.php");
@@ -43,30 +53,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
         <div class="card-body">
+
             <form method="POST">
 
+                <!-- Nama -->
                 <div class="mb-3">
-                    <label class="form-label">Nama Produk</label>
+                    <label>Nama Produk</label>
                     <input type="text" name="nama" class="form-control"
-                           value="<?= $data['nama_produk'] ?>" required>
+                        value="<?= $data['nama_produk'] ?>" required>
                 </div>
 
+                <!-- Harga -->
                 <div class="mb-3">
-                    <label class="form-label">Harga</label>
+                    <label>Harga</label>
                     <input type="number" name="harga" class="form-control"
-                           value="<?= $data['harga'] ?>" required>
+                        value="<?= $data['harga'] ?>" required>
                 </div>
 
+                <!-- Stok -->
                 <div class="mb-3">
-                    <label class="form-label">Stok</label>
+                    <label>Stok</label>
                     <input type="number" name="stok" class="form-control"
-                           value="<?= $data['stok'] ?>" required>
+                        value="<?= $data['stok'] ?>" required>
                 </div>
 
-                <button class="btn btn-warning">Update</button>
-                <a href="index.php" class="btn btn-secondary">Kembali</a>
+                <!-- ✅ DROPDOWN KATEGORI -->
+                <div class="mb-3">
+                    <label>Kategori</label>
+                    <select name="kategori_id" class="form-control" required>
+                        <?php while($k = mysqli_fetch_assoc($kategori)) { ?>
+                            <option value="<?= $k['id'] ?>"
+                                <?= $k['id'] == $data['kategori_id'] ? 'selected' : '' ?>>
+                                <?= $k['nama_kategori'] ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
+
+                <!-- Tombol -->
+                <div class="d-flex justify-content-between">
+                    <a href="index.php" class="btn btn-secondary">← Kembali</a>
+                    <button class="btn btn-warning">Update</button>
+                </div>
 
             </form>
+
         </div>
 
     </div>
