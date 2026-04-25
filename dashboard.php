@@ -66,7 +66,7 @@ $dataJumlah = mysqli_fetch_assoc($jumlah);
                     <br>
 
                     <!-- Tombol ke kategori (yang kamu minta) -->
-                    <a href="kategori/index.php" class="btn btn-success mt-2">
+                    <a href="kategori/index1.php" class="btn btn-success mt-2">
                         Kelola Kategori
                     </a>
 
