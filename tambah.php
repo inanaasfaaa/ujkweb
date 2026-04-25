@@ -1,13 +1,26 @@
 <?php
 session_start();
+if (!isset($_SESSION['login'])) {
+    header("Location: ../login.php");
+    exit;
+}
+
 include '../koneksi.php';
 
-// Jika form disubmit
-if ($_POST) {
-    $nama = $_POST['nama'];
+// Ambil data kategori untuk dropdown
+$kategori = mysqli_query($conn, "SELECT * FROM kategori");
 
-    mysqli_query($conn, "INSERT INTO kategori (nama_kategori) 
-    VALUES ('$nama')");
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+    $nama  = $_POST['nama'];
+    $harga = $_POST['harga'];
+    $stok  = $_POST['stok'];
+    $kategori_id = $_POST['kategori_id']; // ← TAMBAHAN
+
+    // INSERT sudah ditambah kategori_id
+    mysqli_query($conn, "INSERT INTO products 
+    (nama_produk, harga, stok, kategori_id) 
+    VALUES ('$nama', '$harga', '$stok', '$kategori_id')");
 
     header("Location: index.php");
     exit;
@@ -17,44 +30,54 @@ if ($_POST) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tambah Kategori</title>
+    <title>Tambah Produk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-light">
 
-<div class="container mt-5">
+<div class="container mt-4">
 
-    <!-- Card -->
-    <div class="card shadow border-0">
+    <h3>Tambah Produk</h3>
 
-        <!-- Header -->
-        <div class="card-header bg-success text-white">
-            <h4 class="mb-0">Tambah Kategori</h4>
+    <form method="POST">
+
+        <!-- Nama -->
+        <div class="mb-3">
+            <label>Nama Produk</label>
+            <input type="text" name="nama" class="form-control" required>
         </div>
 
-        <!-- Body -->
-        <div class="card-body">
-
-            <form method="POST">
-
-                <!-- Nama -->
-                <div class="mb-3">
-                    <label class="form-label">Nama Kategori</label>
-                    <input type="text" name="nama" class="form-control" required>
-                </div>
-
-                <!-- Tombol -->
-                <div class="d-flex justify-content-between">
-                    <a href="index.php" class="btn btn-secondary">← Kembali</a>
-                    <button class="btn btn-success">Simpan</button>
-                </div>
-
-            </form>
-
+        <!-- Harga -->
+        <div class="mb-3">
+            <label>Harga</label>
+            <input type="number" name="harga" class="form-control" required>
         </div>
 
-    </div>
+        <!-- Stok -->
+        <div class="mb-3">
+            <label>Stok</label>
+            <input type="number" name="stok" class="form-control" required>
+        </div>
+
+        <!-- ✅ DROPDOWN KATEGORI (DITAMBAHKAN DI SINI) -->
+        <div class="mb-3">
+            <label class="form-label">Kategori</label>
+            <select name="kategori_id" class="form-control" required>
+                <option value="">-- Pilih Kategori --</option>
+                <?php while($k = mysqli_fetch_assoc($kategori)) { ?>
+                    <option value="<?= $k['id'] ?>">
+                        <?= $k['nama_kategori'] ?>
+                    </option>
+                <?php } ?>
+            </select>
+        </div>
+
+        <!-- Tombol -->
+        <button class="btn btn-success">Simpan</button>
+        <a href="index.php" class="btn btn-secondary">Kembali</a>
+
+    </form>
 
 </div>
 

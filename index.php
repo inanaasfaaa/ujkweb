@@ -1,82 +1,68 @@
 <?php
 session_start();
+if (!isset($_SESSION['login'])) {
+    header("Location: ../login.php");
+    exit;
+}
+
 include '../koneksi.php';
 
-// Ambil data kategori
-$data = mysqli_query($conn, "SELECT * FROM kategori");
+// ✅ QUERY SUDAH JOIN KATEGORI
+$data = mysqli_query($conn, "
+    SELECT products.*, kategori.nama_kategori 
+    FROM products 
+    LEFT JOIN kategori ON products.kategori_id = kategori.id
+");
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Data Kategori</title>
+    <title>Data Produk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<body>
 
-<body class="bg-light">
+<div class="container mt-4">
 
-<div class="container mt-5">
-
-    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>📂 Data Kategori</h3>
+        <h3>Data Produk</h3>
         <a href="../dashboard.php" class="btn btn-secondary">← Kembali</a>
     </div>
 
-    <!-- Tombol tambah -->
-    <a href="tambah.php" class="btn btn-success mb-3">+ Tambah Kategori</a>
+    <a href="tambah.php" class="btn btn-success mb-3">+ Tambah</a>
 
-    <!-- Card -->
-    <div class="card shadow border-0">
-        <div class="card-body">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nama</th>
+                <th>Harga</th>
+                <th>Stok</th>
+                <!-- ✅ KOLOM BARU -->
+                <th>Kategori</th>
+                <th width="150">Aksi</th>
+            </tr>
+        </thead>
 
-            <!-- Tabel -->
-            <table class="table table-bordered table-striped table-hover">
-                
-                <thead class="table-dark">
-                    <tr>
-                        <th>Nama</th>
-                        <th width="150">Aksi</th>
-                    </tr>
-                </thead>
+        <tbody>
+        <?php while ($d = mysqli_fetch_assoc($data)) { ?>
+            <tr>
+                <td><?= $d['nama_produk'] ?></td>
+                <td>Rp <?= number_format($d['harga']) ?></td>
+                <td><?= $d['stok'] ?></td>
 
-                <tbody>
-                <?php 
-                if (mysqli_num_rows($data) > 0) {
-                    while ($d = mysqli_fetch_assoc($data)) { 
-                ?>
-                    <tr>
-                        <td><?= htmlspecialchars($d['nama_kategori']) ?></td>
-                        <td>
-                            <!-- Tombol Edit -->
-                            <a href="edit.php?id=<?= $d['id'] ?>" 
-                               class="btn btn-warning btn-sm">Edit</a>
+                <!-- ✅ TAMPILKAN KATEGORI -->
+                <td><?= $d['nama_kategori'] ?? '-' ?></td>
 
-                            <!-- Tombol Hapus -->
-                            <a href="hapus.php?id=<?= $d['id'] ?>" 
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Yakin hapus data ini?')">
-                               Hapus
-                            </a>
-                        </td>
-                    </tr>
-                <?php 
-                    }
-                } else {
-                ?>
-                    <!-- Jika data kosong -->
-                    <tr>
-                        <td colspan="3" class="text-center text-muted">
-                            Belum ada data kategori
-                        </td>
-                    </tr>
-                <?php } ?>
-                </tbody>
-
-            </table>
-
-        </div>
-    </div>
+                <td>
+                    <a href="edit.php?id=<?= $d['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="hapus.php?id=<?= $d['id'] ?>" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Yakin hapus?')">Hapus</a>
+                </td>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
 
 </div>
 
