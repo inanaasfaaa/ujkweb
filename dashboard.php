@@ -56,13 +56,25 @@ $dataJumlah = mysqli_fetch_assoc($jumlah);
         <div class="col-md-4">
             <div class="card shadow border-0">
                 <div class="card-body text-center">
-                    <h5 class="card-title">Kelola Produk</h5>
+                    <h5 class="card-title">Kelola Data</h5>
+
+                    <!-- Tombol ke produk -->
                     <a href="products/index.php" class="btn btn-primary mt-2">
-                        Masuk
+                        Produk
                     </a>
+
+                    <br>
+
+                    <!-- Tombol ke kategori (yang kamu minta) -->
+                    <a href="kategori/index.php" class="btn btn-success mt-2">
+                        Kelola Kategori
+                    </a>
+
                 </div>
             </div>
         </div>
+
+    </div>
 
 </div>
 
